@@ -2,7 +2,9 @@ idf_component_register(
   SRCS
     "main.cpp"
     "LED/LED.cpp"
+    "Timer/Timer.cpp"
   INCLUDE_DIRS
     "."
     "LED"
+    "Timer"
 )
