@@ -1,5 +1,8 @@
 #include "LED/LED.h"
 #include "driver/gpio.h"
+#include "hal/timer_types.h"
+#include "soc/clk_tree_defs.h"
+#include <cstdint>
 
 
 void LED::init() {
@@ -47,6 +50,21 @@ void LED::blink_task() {
     blink();
     vTaskDelay(pdMS_TO_TICKS(500));
   }
+}
+
+void LED::blink_timer(uint64_t period_us) {
+  _blink_timer = Timer(GPTIMER_COUNT_UP, GPTIMER_CLK_SRC_DEFAULT, period_us);
+  _blink_timer.attach_callback(_timer_callback, this);
+  _blink_timer.change_period(period_us);
+  _blink_timer.start();
+}
+
+bool LED::_timer_callback(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_data) {
+  LED *led_instance = static_cast<LED*>(user_data);
+  int status = gpio_get_level(led_instance->_pin_num);
+  gpio_set_level(led_instance->_pin_num, !status);
+  ESP_LOGI("LED_CALLBACK", "LED toggled");
+  return true;
 }
 
 
