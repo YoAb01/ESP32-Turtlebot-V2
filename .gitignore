@@ -1,5 +1,7 @@
 .cache/**
+.vscode/**
 build/**
 sdkconfig
+sdkconfig.old
 wiki/X-Random Notes.md
 
