@@ -6,10 +6,10 @@
 
 
 void LED::init() {
-  // Configure the pin number by reseting and setting to OUTPUT mode
   gpio_reset_pin(_pin_num);
   gpio_set_direction(_pin_num, GPIO_MODE_OUTPUT);
-  gpio_set_level(_pin_num, 0);   // LED starts off
+  gpio_set_level(_pin_num, 0);
+  _status = 0;
 }
 
 int LED::get_status() {
@@ -56,17 +56,17 @@ void LED::blink_task() {
 }
 
 void LED::blink_timer(uint64_t period_us) {
-  _blink_timer = Timer(GPTIMER_COUNT_UP, GPTIMER_CLK_SRC_DEFAULT, period_us);
-  _blink_timer.attach_callback(_timer_callback, this);
-  _blink_timer.change_period(period_us);
-  _blink_timer.start();
+  _blink_timer = new Timer(GPTIMER_COUNT_UP, GPTIMER_CLK_SRC_DEFAULT, period_us);
+  _blink_timer->init();
+  _blink_timer->change_period(period_us);
+  _blink_timer->attach_callback(_timer_callback, this);
+  _blink_timer->start();
 }
 
 bool LED::_timer_callback(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_data) {
   LED *led_instance = static_cast<LED*>(user_data);
-  int status = gpio_get_level(led_instance->_pin_num);
-  gpio_set_level(led_instance->_pin_num, !status);
-  ESP_LOGI("LED_CALLBACK", "LED toggled");
+  led_instance->_status = !led_instance->_status;
+  gpio_set_level(led_instance->_pin_num, led_instance->_status);
   return true;
 }
 

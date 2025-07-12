@@ -9,13 +9,16 @@
 #include <cstdint>
 
 
-void Timer::start() {
+void Timer::init() {
   gptimer_config_t timer_config = {};
   timer_config.clk_src = _clk_src;
   timer_config.direction = _direction;
-  timer_config.resolution_hz = 10000000;
+  timer_config.resolution_hz = 1000000;
   timer_config.intr_priority = 0;
   ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &_timer_handle));
+}
+
+void Timer::start() {
   ESP_ERROR_CHECK(gptimer_enable(_timer_handle));
   ESP_ERROR_CHECK(gptimer_start(_timer_handle));
 }
@@ -35,6 +38,7 @@ void Timer::attach_callback(gptimer_alarm_cb_t callback, void* user_data) {
 void Timer::change_period(uint64_t period_us) {
   _period_us = period_us;
   gptimer_alarm_config_t alarm_config = {};
+  alarm_config.reload_count = 0;
   alarm_config.alarm_count = period_us;
   alarm_config.flags.auto_reload_on_alarm = true;
   ESP_ERROR_CHECK(gptimer_set_alarm_action(_timer_handle, &alarm_config));

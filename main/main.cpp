@@ -19,10 +19,12 @@ extern "C" void app_main(void)
   red_led.init();
 
   // LED blink task
-  builtin_led.set_blink_interval(1000);
-  red_led.set_blink_interval(5000);
+  // builtin_led.set_blink_interval(1000);
+  // red_led.set_blink_interval(5000);
 
-  xTaskCreate(LED::_blink_task_w, "red_led_blink_task", 2048, &red_led, 1, NULL);
-  xTaskCreate(LED::_blink_task_w, "builtin_led_blink_task", 2048, &builtin_led, 1, NULL);
+  // xTaskCreate(LED::_blink_task_w, "red_led_blink_task", 2048, &red_led, 1, NULL);
+  // xTaskCreate(LED::_blink_task_w, "builtin_led_blink_task", 2048, &builtin_led, 1, NULL);
 
+  builtin_led.blink_timer(200000);  // 0.2 seconds
+  red_led.blink_timer(3000000);     // 3 second
 }

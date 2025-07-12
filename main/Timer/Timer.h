@@ -12,8 +12,9 @@
 
 class Timer {
 public:
-  Timer(gptimer_count_direction_t direction = GPTIMER_COUNT_UP, gptimer_clock_source_t clk_src = GPTIMER_CLK_SRC_DEFAULT, uint32_t period_us = 1000000) 
+  Timer(gptimer_count_direction_t direction = GPTIMER_COUNT_UP, gptimer_clock_source_t clk_src = GPTIMER_CLK_SRC_DEFAULT, uint64_t period_us = 1000000) 
     : _period_us(period_us), _direction(direction), _clk_src(clk_src) {}
+  void init();
   void start();
   void stop();
   void change_period(uint64_t period_us);

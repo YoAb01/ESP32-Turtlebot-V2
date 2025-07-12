@@ -24,6 +24,13 @@ public:
     ESP_LOGI(LED_TAG, "LED instance added at pin %i", pin);
   }
 
+  ~LED() {
+    if (_blink_timer) {
+      _blink_timer->stop();
+      delete _blink_timer;
+    }
+  }
+
   void init();
   int get_status();
   void set_blink_interval(int interval);
@@ -48,7 +55,7 @@ private:
   int _fade_amount = 5;
   int _status = 0;
 
-  Timer _blink_timer;
+  Timer* _blink_timer = nullptr;
   static bool _timer_callback(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_data);
 };
 
