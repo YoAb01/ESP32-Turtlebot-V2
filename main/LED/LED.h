@@ -26,6 +26,7 @@ public:
 
   void init();
   int get_status();
+  void set_blink_interval(int interval);
   void set_on();
   void set_off();
   void blink();

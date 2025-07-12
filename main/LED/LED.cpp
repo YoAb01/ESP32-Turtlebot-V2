@@ -27,6 +27,10 @@ int LED::get_status() {
     return -1;
 }
 
+void LED::set_blink_interval(int interval) {
+  _blink_interval = interval;
+}
+
 void LED::set_on() {
   ESP_LOGI(LED_TAG, "Setting the LED at pin %i to HIGH", _pin_num);
   gpio_set_level(_pin_num, 1);
@@ -40,15 +44,14 @@ void LED::set_off() {
 void LED::blink() {
   ESP_LOGI(LED_TAG, "Start blinking the LED at %i interval", _blink_interval);
   set_on();
-  vTaskDelay(_blink_interval / portTICK_PERIOD_MS);
+  vTaskDelay(pdMS_TO_TICKS(_blink_interval));
   set_off();
-  vTaskDelay(_blink_interval / portTICK_PERIOD_MS);
+  vTaskDelay(pdMS_TO_TICKS(_blink_interval));
 }
 
 void LED::blink_task() {
   while (true) {
     blink();
-    vTaskDelay(pdMS_TO_TICKS(500));
   }
 }
 
