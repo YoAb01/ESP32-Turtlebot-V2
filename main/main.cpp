@@ -7,9 +7,9 @@
 #define LED_R_PIN     GPIO_NUM_4
 #define LED_G_PIN     GPIO_NUM_5
 
-#define MOTOR_A_IN1_PIN GPIO_NUM_16
-#define MOTOR_A_IN2_PIN GPIO_NUM_17
-#define MOTOR_A_PWM_PIN GPIO_NUM_18
+#define MOTOR_A_IN1_PIN GPIO_NUM_37
+#define MOTOR_A_IN2_PIN GPIO_NUM_38
+#define MOTOR_A_PWM_PIN GPIO_NUM_39
 
 #define MOTOR_B_IN1_PIN GPIO_NUM_42
 #define MOTOR_B_IN2_PIN GPIO_NUM_41
@@ -25,20 +25,20 @@ Motor motorB(MOTOR_B_IN1_PIN, MOTOR_B_IN2_PIN, MOTOR_B_PWM_PIN);
 void test_robot_motion(void *pvParameter) {
   while (1) {
       ESP_LOGI("MOTOR", "Moving forward...");
-      motorA.motor_control(100);
-      motorB.motor_control(100);
+      motorA.motor_control(80);
+      motorB.motor_control(80);
       vTaskDelay(2000 / portTICK_PERIOD_MS);
       ESP_LOGI("MOTOR", "Moving backward...");
-      motorA.motor_control(-100);
-      motorB.motor_control(-100);
+      motorA.motor_control(-80);
+      motorB.motor_control(-80);
       vTaskDelay(2000 / portTICK_PERIOD_MS);
       ESP_LOGI("MOTOR", "Turning left...");
-      motorA.motor_control(100);
-      motorB.motor_control(-100);
+      motorA.motor_control(80);
+      motorB.motor_control(-80);
       vTaskDelay(2000 / portTICK_PERIOD_MS);
       ESP_LOGI("MOTOR", "Turning right...");
-      motorA.motor_control(-100);
-      motorB.motor_control(100);
+      motorA.motor_control(-80);
+      motorB.motor_control(80);
       vTaskDelay(2000 / portTICK_PERIOD_MS);
       motorA.stop();
       motorB.stop();
