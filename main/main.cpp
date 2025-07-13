@@ -5,6 +5,7 @@
 #include "IMU/IMU.h"
 #include "IRSensor/IRSensor.h"
 #include "WiFi/WiFiManager.h"
+#include "wifi_confidentials.h"
 
 #define BUILTIN_PIN   GPIO_NUM_2
 #define LED_R_PIN     GPIO_NUM_4
@@ -89,6 +90,17 @@ void init_wifi_ap() {
   }
 }
 
+void init_wifi_sta() {
+  const char* ssid = WIFI_SSID_CONN;
+  const char* pwd = WIFI_PASS_CONN;
+
+  if (wifi_ap.init_STA(ssid, pwd)) {
+    ESP_LOGI("WIFI", "Connected Successfully to local network");
+  } else {
+    ESP_LOGE("WIFI", "Failed to connect to local network");
+  }
+} 
+
 extern "C" void app_main(void)
 {
 
@@ -111,7 +123,10 @@ extern "C" void app_main(void)
   ir_center.init();
 
   // WiFi Access Point
-  init_wifi_ap();
+  /* init_wifi_ap(); */
+
+  // WiFi Local Network Connection
+  init_wifi_sta();
 
   xTaskCreate(test_robot_motion, "robot_movement_task", 2048, NULL, 5, NULL);
   /* xTaskCreate(test_imu_data, "imu_data_task", 2048, NULL, 4, NULL); */
