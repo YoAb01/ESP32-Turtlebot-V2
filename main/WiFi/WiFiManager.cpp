@@ -4,6 +4,7 @@
 #include "esp_netif.h"
 #include "esp_wifi.h"
 #include "esp_wifi_default.h"
+#include "esp_wifi_types_generic.h"
 #include "nvs_flash.h"
 
 
@@ -33,5 +34,31 @@ bool WiFiManager::init_AP(const char* ssid, const char* password) {
   ESP_ERROR_CHECK(esp_wifi_start());
 
   ESP_LOGI("WIFI_AP", "Access Point started! SSID: %s, Password: %s", ap_config.ap.ssid, ap_config.ap.password);
+  return true;
+}
+
+bool WiFiManager::init_STA(const char* ssid, const char* password) {
+  ESP_ERROR_CHECK(nvs_flash_init());
+  ESP_ERROR_CHECK(esp_netif_init());
+  ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+  esp_netif_create_default_wifi_sta();
+
+  wifi_init_config_t wifi_config = WIFI_INIT_CONFIG_DEFAULT();
+  ESP_ERROR_CHECK(esp_wifi_init(&wifi_config));
+
+  wifi_config_t sta_config = {};
+  strcpy((char *)sta_config.sta.ssid, ssid);
+  strcpy((char *)sta_config.sta.password, password);
+  sta_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+  sta_config.sta.pmf_cfg.capable = true;
+  sta_config.sta.pmf_cfg.required = false;
+
+  ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+  ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta_config));
+  ESP_ERROR_CHECK(esp_wifi_start());
+
+  ESP_LOGI("WIFI_STA", "wifi_init_sta finished");
+  ESP_LOGI("WIFI_STA", "Connecting to %s...", ssid);
   return true;
 }
