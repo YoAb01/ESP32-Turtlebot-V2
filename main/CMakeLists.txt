@@ -6,10 +6,12 @@ idf_component_register(
     "Timer/Timer.cpp"
     "Motor/Motor.cpp"
     "IMU/IMU.cpp"
+    "IRSensor/IRSensor.cpp"
   INCLUDE_DIRS
     "."
     "LED"
     "Timer"
     "Motor"
     "IMU"
+    "IRSensor"
 )
