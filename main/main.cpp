@@ -3,6 +3,7 @@
 #include "Timer/Timer.h"
 #include "Motor/Motor.h"
 #include "IMU/IMU.h"
+#include "IRSensor/IRSensor.h"
 
 #define BUILTIN_PIN   GPIO_NUM_2
 #define LED_R_PIN     GPIO_NUM_4
@@ -19,12 +20,15 @@
 #define I2C_MASTER_SCK_IO           GPIO_NUM_21
 #define I2C_MASTER_SDA_IO           GPIO_NUM_47
 
+#define IR_CENTER_PIN   GPIO_NUM_20
+
 LED builtin_led(BUILTIN_PIN);
 LED red_led(LED_R_PIN);
 LED green_led(LED_G_PIN);
 Motor motorA(MOTOR_A_IN1_PIN, MOTOR_A_IN2_PIN, MOTOR_A_PWM_PIN);
 Motor motorB(MOTOR_B_IN1_PIN, MOTOR_B_IN2_PIN, MOTOR_B_PWM_PIN);
 IMU mpu6050(I2C_MASTER_SDA_IO, I2C_MASTER_SCK_IO);
+IRSensor ir_center(IR_CENTER_PIN);
 
 void test_robot_motion(void *pvParameter) {
   while (1) {
@@ -61,6 +65,17 @@ void test_imu_data(void *pvParameter) {
   }
 }
 
+void test_ir_sensor(void *pvParameter) {
+  while (1) {
+    bool state = ir_center.is_object_detected();
+    ESP_LOGI("IR", "Raw IR state: %d", state);
+    if (state) {
+      ESP_LOGI("IR", "(1) Obstacle DETECTED");
+    }
+    vTaskDelay(pdMS_TO_TICKS(200));
+  }
+}
+
 extern "C" void app_main(void)
 {
 
@@ -77,10 +92,14 @@ extern "C" void app_main(void)
   motorB.init();
 
   // IMU data
-  mpu6050.init_imu();
+  /* mpu6050.init_imu(); */
+
+  // IR sensor
+  ir_center.init();
 
   xTaskCreate(test_robot_motion, "robot_movement_task", 2048, NULL, 5, NULL);
-  xTaskCreate(test_imu_data, "imu_data_task", 2048, NULL, 4, NULL);
+  /* xTaskCreate(test_imu_data, "imu_data_task", 2048, NULL, 4, NULL); */
+  xTaskCreate(test_ir_sensor, "ir_data_task", 2048, NULL, 3, NULL);
 
 
 
