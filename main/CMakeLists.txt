@@ -7,6 +7,7 @@ idf_component_register(
     "Motor/Motor.cpp"
     "IMU/IMU.cpp"
     "IRSensor/IRSensor.cpp"
+    "Camera/Camera.cpp"
   INCLUDE_DIRS
     "."
     "LED"
@@ -14,4 +15,5 @@ idf_component_register(
     "Motor"
     "IMU"
     "IRSensor"
+    "Camera"
 )
