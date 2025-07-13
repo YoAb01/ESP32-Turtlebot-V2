@@ -4,6 +4,7 @@
 #include "Motor/Motor.h"
 #include "IMU/IMU.h"
 #include "IRSensor/IRSensor.h"
+#include "WiFi/WiFiManager.h"
 
 #define BUILTIN_PIN   GPIO_NUM_2
 #define LED_R_PIN     GPIO_NUM_4
@@ -29,6 +30,7 @@ Motor motorA(MOTOR_A_IN1_PIN, MOTOR_A_IN2_PIN, MOTOR_A_PWM_PIN);
 Motor motorB(MOTOR_B_IN1_PIN, MOTOR_B_IN2_PIN, MOTOR_B_PWM_PIN);
 IMU mpu6050(I2C_MASTER_SDA_IO, I2C_MASTER_SCK_IO);
 IRSensor ir_center(IR_CENTER_PIN);
+WiFiManager wifi_ap;
 
 void test_robot_motion(void *pvParameter) {
   while (1) {
@@ -76,6 +78,17 @@ void test_ir_sensor(void *pvParameter) {
   }
 }
 
+void init_wifi_ap() {
+  const char* ssid = "ESP32-Robot";
+  const char* pwd = "password_esp32_2025";
+
+  if (wifi_ap.init_AP(ssid, pwd)) {
+    ESP_LOGI("WIFI", "Access Point started successfully!");
+  } else {
+    ESP_LOGE("WIFI", "Failed to start Access Point.");
+  }
+}
+
 extern "C" void app_main(void)
 {
 
@@ -96,6 +109,9 @@ extern "C" void app_main(void)
 
   // IR sensor
   ir_center.init();
+
+  // WiFi Access Point
+  init_wifi_ap();
 
   xTaskCreate(test_robot_motion, "robot_movement_task", 2048, NULL, 5, NULL);
   /* xTaskCreate(test_imu_data, "imu_data_task", 2048, NULL, 4, NULL); */
