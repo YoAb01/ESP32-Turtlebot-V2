@@ -3,11 +3,11 @@ idf_component_register(
     "main.cpp"
     "LED/LED.cpp"
     "Timer/Timer.cpp"
-    "Timer/Timer.cpp"
     "Motor/Motor.cpp"
     "IMU/IMU.cpp"
     "IRSensor/IRSensor.cpp"
     "Camera/Camera.cpp"
+    "WiFi/WiFiManager.cpp"
   INCLUDE_DIRS
     "."
     "LED"
@@ -16,4 +16,5 @@ idf_component_register(
     "IMU"
     "IRSensor"
     "Camera"
+    "WiFi"
 )
