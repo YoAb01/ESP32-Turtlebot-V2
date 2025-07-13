@@ -39,32 +39,62 @@ This project is a **full-stack embedded robotics platform** built around the **E
 
 ### 📅 **Roadmap & Milestones**
 
-#### **Phase 1 – Embedded Foundations**
+#### ✅ **Phase 1 – Embedded Foundations**
 
-- **1.1:** GPIO + FreeRTOS LED Task
-  - Blink LED at 1Hz using FreeRTOS task and timer interrupt 
-- **1.2:** Button input reading + interrupt handling
-- **1.3:** PWM motor driver control with MCPWM
-- **1.4:** I2C communication with MPU6050 (IMU driver)
-- **1.5:** Ultrasonic sensor interfacing with timer-based measurement
-- **1.6:** Servo motor control via PWM for sensor scanning
+- [x] **1.1:** GPIO + FreeRTOS LED Task
+  - [x] Blink LED at 1Hz using FreeRTOS task and timer interrupt
+
+- [x] **1.2:** Button input reading + interrupt handling
+
+- [x] **1.3:** PWM motor driver control with MCPWM
+
+- [x] **1.4:** I2C communication with MPU6050 (IMU driver)
+
+- [ ] **1.5:** Ultrasonic sensor interfacing with timer-based measurement
+
+- [x] **1.6:** Infrared sensor integration for obstacle detection
+
+- [ ] **1.7:** Servo motor control via PWM for sensor scanning (Optional)
 
 ---
 
-#### **Phase 2 – Communication & Control**
+#### ✅ **Phase 2 – Sensors, Communication & Control**
 
-- **2.1:** WiFi connectivity in Station + Access Point modes
-- **2.2:** UDP-based joystick remote control
-- **2.3:** Web server control interface (ESP-IDF HTTP server)
+- [ ] **2.1:** Camera Integration
+  - [ ]  Initialize camera driver (esp32-camera)
+  - [ ]  Capture still image and print confirmation log
+  - [ ]  Stream camera feed to local HTTP server (test only)
+  - [ ]  Process image data for brightness/obstacle confirmation (Optional)
+
+- [ ] **2.2:** WiFi connectivity (Station + Access Point modes)
+  - [ ] Setup robust WiFi connection in both modes
+
+- [ ] **2.3:** UDP-based joystick remote control
+  - [ ] Receive joystick axes and button states via UDP socket
+
+- [ ] **2.4:** Manual vs Auto mode switching
+  - [ ] Toggle between teleoperation (manual) and autonomous modes using joystick buttons
+
+- [ ] **2.5:** Actuator feedback control via joystick buttons
+  - [ ] Trigger buzzer, LEDs, or servo based on joystick inputs
+
+- [ ] **2.6:** Basic teleoperation control logic
+  - [ ] Map joystick axes to differential drive motor speeds
 
 ---
 
-#### **Phase 3 – Modular Robotics System**
+#### ✅ **Phase 3 – Modular Robotics System & Intelligence**
 
-- **3.1:** Integration of motor, IMU, and ultrasonic modules
-- **3.2:** Basic navigation and obstacle avoidance logic
-- **3.3:** AI/ML inference on ESP32-S3 for gesture recognition or simple CV
-- **3.4:** Train a TinyML algorithm to recognize current state motion using IMU data training
+- [ ] **3.1:** Integration of motor, IMU, ultrasonic, and IR modules
+
+- [ ] **3.2:** Basic navigation and obstacle avoidance logic (autonomous mode)
+
+- [ ] **3.3:** AI/ML inference on ESP32-S3 for gesture recognition or simple CV
+
+- [ ] **3.4:** Train a TinyML algorithm to recognize current motion states using IMU data
+
+- [ ] **3.5:** Web server control interface (ESP-IDF HTTP server + JS/CSS frontend + Python socket.io backend)
+
 
 ---
 
