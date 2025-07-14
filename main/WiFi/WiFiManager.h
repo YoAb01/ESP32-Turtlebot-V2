@@ -30,8 +30,12 @@ public:
   WiFiManager() {}
   bool init_AP(const char* ssid, const char* password);
   bool init_STA(const char* ssid, const char* password);
+  static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
 
   std::string get_local_ip();
+
+private:
+  static std::string _local_ip;
 };
 
 #endif   // WIFI_MANAGER_H

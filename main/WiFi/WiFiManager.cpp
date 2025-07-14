@@ -7,6 +7,7 @@
 #include "esp_wifi_types_generic.h"
 #include "nvs_flash.h"
 
+std::string WiFiManager::_local_ip;
 
 bool WiFiManager::init_AP(const char* ssid, const char* password) {
   ESP_ERROR_CHECK(nvs_flash_init());
@@ -37,6 +38,22 @@ bool WiFiManager::init_AP(const char* ssid, const char* password) {
   return true;
 }
 
+
+void WiFiManager::wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
+  if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
+    esp_wifi_connect();
+  } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+    ESP_LOGI("WIFI_STA", "Disconnected. Reconnecting...");
+    esp_wifi_connect();
+  } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
+    ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
+    char ip_str[16];
+    sprintf(ip_str, IPSTR, IP2STR(&event->ip_info.ip));
+    _local_ip = std::string(ip_str);
+    ESP_LOGI("WIFI_STA", "Got IP Address: %s", ip_str);
+  }
+}
+
 bool WiFiManager::init_STA(const char* ssid, const char* password) {
   ESP_ERROR_CHECK(nvs_flash_init());
   ESP_ERROR_CHECK(esp_netif_init());
@@ -46,6 +63,9 @@ bool WiFiManager::init_STA(const char* ssid, const char* password) {
 
   wifi_init_config_t wifi_config = WIFI_INIT_CONFIG_DEFAULT();
   ESP_ERROR_CHECK(esp_wifi_init(&wifi_config));
+
+  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL));
+  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL));
 
   wifi_config_t sta_config = {};
   strcpy((char *)sta_config.sta.ssid, ssid);
@@ -61,4 +81,8 @@ bool WiFiManager::init_STA(const char* ssid, const char* password) {
   ESP_LOGI("WIFI_STA", "wifi_init_sta finished");
   ESP_LOGI("WIFI_STA", "Connecting to %s...", ssid);
   return true;
+}
+
+std::string WiFiManager::get_local_ip() {
+  return _local_ip;
 }
