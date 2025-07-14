@@ -5,7 +5,10 @@
 #include "IMU/IMU.h"
 #include "IRSensor/IRSensor.h"
 #include "WiFi/WiFiManager.h"
+#include "esp_camera.h"
+#include "freertos/idf_additions.h"
 #include "wifi_confidentials.h"
+#include "Camera/Camera.h"
 
 #define BUILTIN_PIN   GPIO_NUM_2
 #define LED_R_PIN     GPIO_NUM_4
@@ -32,6 +35,7 @@ Motor motorB(MOTOR_B_IN1_PIN, MOTOR_B_IN2_PIN, MOTOR_B_PWM_PIN);
 IMU mpu6050(I2C_MASTER_SDA_IO, I2C_MASTER_SCK_IO);
 IRSensor ir_center(IR_CENTER_PIN);
 WiFiManager wifi_ap;
+Camera ov2640;
 
 void test_robot_motion(void *pvParameter) {
   while (1) {
@@ -101,6 +105,19 @@ void init_wifi_sta() {
   }
 } 
 
+void test_camera_capture(void *pvParameter) {
+  while (1) {
+    camera_fb_t* fb = ov2640.capture_frame();
+    if (fb) {
+      ESP_LOGI("CAMERA", "Captured image with %zu bytes", fb->len);
+      ov2640.release_frame(fb);
+    } else {
+      ESP_LOGE("CAMERA", "Capture failed.");
+    }
+    vTaskDelay(pdMS_TO_TICKS(2000));
+  }
+}
+
 extern "C" void app_main(void)
 {
 
@@ -128,9 +145,13 @@ extern "C" void app_main(void)
   // WiFi Local Network Connection
   init_wifi_sta();
 
+  // Init the camera
+  ov2640.init();
+
   xTaskCreate(test_robot_motion, "robot_movement_task", 2048, NULL, 5, NULL);
   /* xTaskCreate(test_imu_data, "imu_data_task", 2048, NULL, 4, NULL); */
   xTaskCreate(test_ir_sensor, "ir_data_task", 2048, NULL, 3, NULL);
+  xTaskCreate(test_camera_capture, "camera_capture_task", 4096, NULL, 5, NULL);
 
 
 
