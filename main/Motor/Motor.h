@@ -15,7 +15,7 @@ public:
   Motor(gpio_num_t in1_pin, gpio_num_t in2_pin, gpio_num_t pwm_pin)
     : _in1_pin(in1_pin), _in2_pin(in2_pin), _pwm_pin(pwm_pin) {}
 
-  void init(uint32_t freq_hz = 1000);
+  void init(uint32_t freq_hz = 20000);
   void motor_control(float duty_percent);
   void stop();
 

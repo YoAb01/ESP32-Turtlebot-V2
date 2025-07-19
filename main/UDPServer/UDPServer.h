@@ -10,7 +10,7 @@
 
 class UDPServer {
 public:
-  UDPServer();
+  UDPServer(): sock(-1) {} 
   bool begin(uint16_t listen_port);           // Create socket, bind it to the port and prepare for receiving
   int receive(char* buffer, size_t length);
   int send(const char* ip, uint16_t port, const char* data, size_t length);

@@ -14,13 +14,13 @@
 
 #define MAX_BUF 128
 
-#define MOTOR_A_IN1_PIN GPIO_NUM_37
-#define MOTOR_A_IN2_PIN GPIO_NUM_38
-#define MOTOR_A_PWM_PIN GPIO_NUM_39
+#define MOTOR_A_IN1_PIN GPIO_NUM_27
+#define MOTOR_A_IN2_PIN GPIO_NUM_14
+#define MOTOR_A_PWM_PIN GPIO_NUM_26
 
-#define MOTOR_B_IN1_PIN GPIO_NUM_42
-#define MOTOR_B_IN2_PIN GPIO_NUM_41
-#define MOTOR_B_PWM_PIN GPIO_NUM_40
+#define MOTOR_B_IN1_PIN GPIO_NUM_33
+#define MOTOR_B_IN2_PIN GPIO_NUM_32
+#define MOTOR_B_PWM_PIN GPIO_NUM_25
 
 enum ControlMode {
   MANUAL,
@@ -32,9 +32,11 @@ public:
   Robot() 
     : led(GPIO_NUM_2),  // Initialize with builtin LED pin
       rightMotor(MOTOR_A_IN1_PIN, MOTOR_A_IN2_PIN, MOTOR_A_PWM_PIN),
-      leftMotor(MOTOR_B_IN1_PIN, MOTOR_B_IN2_PIN, MOTOR_B_PWM_PIN)
+      leftMotor(MOTOR_B_IN1_PIN, MOTOR_B_IN2_PIN, MOTOR_B_PWM_PIN),
+      udpServer()
   {
-      
+      rightMotor.init();
+      leftMotor.init();
   }
 
   void init();
