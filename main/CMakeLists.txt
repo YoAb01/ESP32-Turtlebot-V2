@@ -8,6 +8,7 @@ idf_component_register(
     "IRSensor/IRSensor.cpp"
     "Camera/Camera.cpp"
     "WiFi/WiFiManager.cpp"
+    "UDPServer/UDPServer.cpp"
   INCLUDE_DIRS
     "."
     "LED"
@@ -17,4 +18,5 @@ idf_component_register(
     "IRSensor"
     "Camera"
     "WiFi"
+    "UDPServer"
 )
