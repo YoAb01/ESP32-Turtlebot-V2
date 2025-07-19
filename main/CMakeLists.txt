@@ -9,6 +9,7 @@ idf_component_register(
     "Camera/Camera.cpp"
     "WiFi/WiFiManager.cpp"
     "UDPServer/UDPServer.cpp"
+    "Robot/Robot.cpp"
   INCLUDE_DIRS
     "."
     "LED"
@@ -19,4 +20,5 @@ idf_component_register(
     "Camera"
     "WiFi"
     "UDPServer"
+    "Robot"
 )
