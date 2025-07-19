@@ -61,16 +61,16 @@ This project is a **full-stack embedded robotics platform** built around the **E
 #### ✅ **Phase 2 – Sensors, Communication & Control**
 
 - [ ] **2.1:** Camera Integration
-  - [ ]  Initialize camera driver (esp32-camera)
-  - [ ]  Capture still image and print confirmation log
+  - [x]  Initialize camera driver (esp32-camera)
+  - [x]  Capture still image and print confirmation log
   - [ ]  Stream camera feed to local HTTP server (test only)
   - [ ]  Process image data for brightness/obstacle confirmation (Optional)
 
-- [ ] **2.2:** WiFi connectivity (Station + Access Point modes)
-  - [ ] Setup robust WiFi connection in both modes
+- [x] **2.2:** WiFi connectivity (Station + Access Point modes)
+  - [x] Setup robust WiFi connection in both modes
 
-- [ ] **2.3:** UDP-based joystick remote control
-  - [ ] Receive joystick axes and button states via UDP socket
+- [x] **2.3:** UDP-based joystick remote control
+  - [x] Receive joystick axes and button states via UDP socket
 
 - [ ] **2.4:** Manual vs Auto mode switching
   - [ ] Toggle between teleoperation (manual) and autonomous modes using joystick buttons
@@ -78,8 +78,8 @@ This project is a **full-stack embedded robotics platform** built around the **E
 - [ ] **2.5:** Actuator feedback control via joystick buttons
   - [ ] Trigger buzzer, LEDs, or servo based on joystick inputs
 
-- [ ] **2.6:** Basic teleoperation control logic
-  - [ ] Map joystick axes to differential drive motor speeds
+- [x] **2.6:** Basic teleoperation control logic
+  - [x] Map joystick axes to differential drive motor speeds
 
 ---
 
