@@ -53,8 +53,8 @@ void Robot::handleJoystickInput() {
 }
 
 void Robot::joystickTeleopControl(float axis_left, float axis_right) {
-  float norm_left = (axis_left / 32767.0f) * 100.0f;
-  float norm_right = (axis_right / 32767.0f) * 100.0f;
+  float norm_left = (axis_left / 127.0f) * 100.0f;
+  float norm_right = (axis_right / 127.0f) * 100.0f;
   
   const float deadzone = 10.0f;
   if (abs(axis_left) < deadzone) axis_left = 0;
@@ -64,7 +64,7 @@ void Robot::joystickTeleopControl(float axis_left, float axis_right) {
   float right_speed = norm_left - norm_right; 
 
   left_speed = std::max(-100.0f, std::min(100.0f, left_speed));
-  right_speed = std::max(-100.0f, std::min(200.0f, right_speed));
+  right_speed = std::max(-100.0f, std::min(100.0f, right_speed));
 
   leftMotor.motor_control(left_speed);
   rightMotor.motor_control(right_speed);
