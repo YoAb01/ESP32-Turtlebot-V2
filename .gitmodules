@@ -1,0 +1,6 @@
+[submodule "libraries/libraries/esp32-camera"]
+	path = libraries/libraries/esp32-camera
+	url = https://github.com/espressif/esp32-camera.git
+[submodule "libraries/esp32-camera"]
+	path = libraries/esp32-camera
+	url = https://github.com/espressif/esp32-camera.git
