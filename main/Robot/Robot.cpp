@@ -42,25 +42,33 @@ void Robot::handleJoystickInput() {
       ESP_LOGE("Robot", "Failed to parse input string");
     }
 
-    int m_axes_vals = sscanf(axes_part, "AXIS:%hhd:%hhd:%hhd:%hhd", &axes[0], &axes[1], &axes[2], &axes[3]);
-    if (m_axes_vals == 4) {
-      ESP_LOGI("Robot", "Axes parsed: %d %d %d %d", axes[0], axes[1], axes[2], axes[3]);
-      // Handle joystick teleop
-      joystickTeleopControl(axes[0], axes[1]);
-    } else {
-      ESP_LOGE("Robot", "Failed to parse axes");
-    }
-
+    // Handle buttons first
     int m_btn_vals = sscanf(btns_part, "BTN:%hhd:%hhd:%hhd:%hhd", &btns[0], &btns[1], &btns[2], &btns[3]);
     if (m_btn_vals == 4) {
       ESP_LOGI("Robot", "Buttons parsed: %d %d %d %d", btns[0], btns[1], btns[2], btns[3]);
       // Handle Buttons
-      if (btns[0]) switchMode(MANUAL);
-      else if (btns[1]) switchMode(AUTO);
+      if (btns[0]) {
+        switchMode(MANUAL);
+        stopRobot(); // Stop when switching to manual
+      }
+      else if (btns[1]) {
+        switchMode(AUTO);
+        robot_state = WAIT; // Reset state when switching to auto
+      }
       else if (btns[2]) led.set_on();
       else if (btns[3]) led.set_off();
     } else {
       ESP_LOGE("Robot", "Failed to parse buttons");
+    }
+
+    // Only process joystick if in MANUAL mode
+    if (_curr_mode == MANUAL) {
+      int m_axes_vals = sscanf(axes_part, "AXIS:%hhd:%hhd:%hhd:%hhd", &axes[0], &axes[1], &axes[2], &axes[3]);
+      if (m_axes_vals == 4) {
+        joystickTeleopControl(axes[0], axes[1]);
+      } else {
+        ESP_LOGE("Robot", "Failed to parse axes");
+      }
     }
   }
 }
