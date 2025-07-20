@@ -65,7 +65,7 @@ void Robot::handleJoystickInput() {
     if (_curr_mode == MANUAL) {
       int m_axes_vals = sscanf(axes_part, "AXIS:%hhd:%hhd:%hhd:%hhd", &axes[0], &axes[1], &axes[2], &axes[3]);
       if (m_axes_vals == 4) {
-        joystickTeleopControl(axes[0], axes[1]);
+        joystickTeleopControl(axes[1], axes[0]);
       } else {
         ESP_LOGE("Robot", "Failed to parse axes");
       }
@@ -102,74 +102,111 @@ void Robot::switchMode(ControlMode newMode) {
 }
 
 void Robot::autonomousNav() {
-  Obstacles obs = checkObstacles();
+    Obstacles obs = checkObstacles();
+    uint64_t current_time = esp_timer_get_time() / 1000;
 
-  switch(robot_state) {
-    case WAIT:
-      timestamp = esp_timer_get_time() / 1000; // in ms
+    switch(robot_state) {
+        case WAIT:
+      timestamp = current_time;
       initMotors();
       robot_state = WAIT_IN_PROGRESS;
+      break;
 
     case WAIT_IN_PROGRESS:
-      if ((esp_timer_get_time() / 1000) - timestamp > 1000) {
+      if (current_time - timestamp > 1000) {
         robot_state = FORWARD;
-        break;
       }
+      break;
+
     case FORWARD:
       moveForward();
+      timestamp = current_time;
       robot_state = FORWARD_IN_PROGESS;
       break;
+
     case FORWARD_IN_PROGESS:
-      setNextRobotStateInAutoMode(obs);
+      if (obs != NO_OBSTACLE) {
+        setNextRobotStateInAutoMode(obs);
+      } else {
+        // Keep moving forward by maintaining motor speeds
+        moveForward();
+      }
       break;
+
     case TURN_LEFT:
       turnLeft();
+      timestamp = current_time;
       robot_state = TURN_LEFT_IN_PROGRESS;
       break;
+
     case TURN_LEFT_IN_PROGRESS:
-      setNextRobotStateInAutoMode(obs);
+      if (current_time - timestamp > TURN_DURATION_MS) {
+        robot_state = FORWARD;
+      }
       break;
+
     case TURN_RIGHT:
       turnRight();
+      timestamp = current_time;
       robot_state = TURN_RIGHT_IN_PROGRESS;
       break;
+
     case TURN_RIGHT_IN_PROGRESS:
-      setNextRobotStateInAutoMode(obs);
+      if (current_time - timestamp > TURN_DURATION_MS) {
+        robot_state = FORWARD;
+      }
       break;
+
     case TURN_LEFT_IN_PLACE:
       turnLeftInPlace();
+      timestamp = current_time;
       robot_state = TURN_LEFT_IN_PLACE_IN_PROGRESS;
       break;
+
     case TURN_LEFT_IN_PLACE_IN_PROGRESS:
-      setNextRobotStateInAutoMode(obs);
+      if (current_time - timestamp > TURN_DURATION_MS) {
+        robot_state = FORWARD;
+      }
       break;
+
     case TURN_RIGHT_IN_PLACE:
       turnRightInPlace();
-      robot_state = TURN_LEFT_IN_PLACE_IN_PROGRESS;
+      timestamp = current_time;
+      robot_state = TURN_RIGHT_IN_PLACE_IN_PROGRESS;  // FIXED: Correct next state
       break;
+
     case TURN_RIGHT_IN_PLACE_IN_PROGRESS:
-      setNextRobotStateInAutoMode(obs);
+      if (current_time - timestamp > TURN_DURATION_MS) {
+        robot_state = FORWARD;
+      }
       break;
+
     default:
       robot_state = WAIT;
       stopRobot();
       break;
   }
+
+  ESP_LOGI("Robot", "Auto State: %d, Obstacles: %d", robot_state, obs);
 }
 
 void Robot::setNextRobotStateInAutoMode(Obstacles obs) {
-  if (obs == NO_OBSTACLE) {
-    next_robot_state = FORWARD;
-  } else if (obs == OBSTACLE_RIGHT) {
-    next_robot_state = TURN_LEFT;
-  } else if (obs == OBSTACLE_LEFT) {
-    next_robot_state = TURN_RIGHT;
-  } else if (obs == OBSTACLE_FRONT) {
-    next_robot_state = TURN_LEFT_IN_PLACE;
-  }
-  if (next_robot_state != robot_state) {
-    robot_state = next_robot_state;
-  }
+    if (robot_state == FORWARD_IN_PROGESS || robot_state == FORWARD) {
+        switch(obs) {
+            case NO_OBSTACLE:
+                // Don't change state if already moving forward
+                break;
+            case OBSTACLE_RIGHT:
+                robot_state = TURN_LEFT;
+                break;
+            case OBSTACLE_LEFT:
+                robot_state = TURN_RIGHT;
+                break;
+            case OBSTACLE_FRONT:
+                robot_state = TURN_LEFT_IN_PLACE;
+                break;
+        }
+    }
 }
 
 Obstacles Robot::checkObstacles() {
@@ -203,23 +240,23 @@ void Robot::moveBackward() {
 }
 
 void Robot::turnLeftInPlace() {
-  rightMotor.motor_control(85);
-  leftMotor.motor_control(-85);
-}
-
-void Robot::turnRightInPlace() {
   rightMotor.motor_control(-85);
   leftMotor.motor_control(85);
 }
 
-void Robot::turnLeft() {
+void Robot::turnRightInPlace() {
   rightMotor.motor_control(85);
-  leftMotor.motor_control(50);
+  leftMotor.motor_control(-85);
+}
+
+void Robot::turnLeft() {
+  rightMotor.motor_control(-85);
+  leftMotor.motor_control(85);
 }
 
 void Robot::turnRight() {
-  rightMotor.motor_control(50);
-  leftMotor.motor_control(85);
+  rightMotor.motor_control(85);
+  leftMotor.motor_control(-85);
 }
 
 void Robot::stopRobot() {
