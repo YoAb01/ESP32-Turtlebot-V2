@@ -1,5 +1,8 @@
 #include "Robot/Robot.h"
+#include "IRSensor.h"
+#include "esp_timer.h"
 #include <cstdint>
+#include <ctime>
 #include <sys/types.h>
 
 void Robot::init() {
@@ -7,7 +10,13 @@ void Robot::init() {
 }
 
 void Robot::update() {
-  if (_curr_mode == MANUAL) handleJoystickInput();
+  handleJoystickInput();
+  if (_curr_mode == MANUAL) {
+    // ...
+  }
+  else if (_curr_mode == AUTO) { 
+    autonomousNav();
+  }
 }
 
 void Robot::handleJoystickInput() {
@@ -46,8 +55,10 @@ void Robot::handleJoystickInput() {
     if (m_btn_vals == 4) {
       ESP_LOGI("Robot", "Buttons parsed: %d %d %d %d", btns[0], btns[1], btns[2], btns[3]);
       // Handle Buttons
-      if (btns[1]) led.set_on();
-      else led.set_off();
+      if (btns[0]) switchMode(MANUAL);
+      else if (btns[1]) switchMode(AUTO);
+      else if (btns[2]) led.set_on();
+      else if (btns[3]) led.set_off();
     } else {
       ESP_LOGE("Robot", "Failed to parse buttons");
     }
@@ -80,4 +91,130 @@ void Robot::switchMode(ControlMode newMode) {
     _curr_mode = newMode;
     ESP_LOGI("Robot", "Mode change %d to %d", prevMode, _curr_mode);
   }
+}
+
+void Robot::autonomousNav() {
+  Obstacles obs = checkObstacles();
+
+  switch(robot_state) {
+    case WAIT:
+      timestamp = esp_timer_get_time() / 1000; // in ms
+      initMotors();
+      robot_state = WAIT_IN_PROGRESS;
+
+    case WAIT_IN_PROGRESS:
+      if ((esp_timer_get_time() / 1000) - timestamp > 1000) {
+        robot_state = FORWARD;
+        break;
+      }
+    case FORWARD:
+      moveForward();
+      robot_state = FORWARD_IN_PROGESS;
+      break;
+    case FORWARD_IN_PROGESS:
+      setNextRobotStateInAutoMode(obs);
+      break;
+    case TURN_LEFT:
+      turnLeft();
+      robot_state = TURN_LEFT_IN_PROGRESS;
+      break;
+    case TURN_LEFT_IN_PROGRESS:
+      setNextRobotStateInAutoMode(obs);
+      break;
+    case TURN_RIGHT:
+      turnRight();
+      robot_state = TURN_RIGHT_IN_PROGRESS;
+      break;
+    case TURN_RIGHT_IN_PROGRESS:
+      setNextRobotStateInAutoMode(obs);
+      break;
+    case TURN_LEFT_IN_PLACE:
+      turnLeftInPlace();
+      robot_state = TURN_LEFT_IN_PLACE_IN_PROGRESS;
+      break;
+    case TURN_LEFT_IN_PLACE_IN_PROGRESS:
+      setNextRobotStateInAutoMode(obs);
+      break;
+    case TURN_RIGHT_IN_PLACE:
+      turnRightInPlace();
+      robot_state = TURN_LEFT_IN_PLACE_IN_PROGRESS;
+      break;
+    case TURN_RIGHT_IN_PLACE_IN_PROGRESS:
+      setNextRobotStateInAutoMode(obs);
+      break;
+    default:
+      robot_state = WAIT;
+      stopRobot();
+      break;
+  }
+}
+
+void Robot::setNextRobotStateInAutoMode(Obstacles obs) {
+  if (obs == NO_OBSTACLE) {
+    next_robot_state = FORWARD;
+  } else if (obs == OBSTACLE_RIGHT) {
+    next_robot_state = TURN_LEFT;
+  } else if (obs == OBSTACLE_LEFT) {
+    next_robot_state = TURN_RIGHT;
+  } else if (obs == OBSTACLE_FRONT) {
+    next_robot_state = TURN_LEFT_IN_PLACE;
+  }
+  if (next_robot_state != robot_state) {
+    robot_state = next_robot_state;
+  }
+}
+
+Obstacles Robot::checkObstacles() {
+  bool left_detect = ir_sensor[0].is_object_detected() || ir_sensor[1].is_object_detected();
+  bool right_detect = ir_sensor[3].is_object_detected() || ir_sensor[4].is_object_detected();
+  bool front_detect = ir_sensor[2].is_object_detected();
+
+  if (front_detect)
+    return OBSTACLE_FRONT;
+  else if (left_detect)
+    return OBSTACLE_LEFT;
+  else if (right_detect)
+    return OBSTACLE_RIGHT;
+  else
+    return NO_OBSTACLE;
+}
+
+void Robot::initMotors() {
+  rightMotor.init();
+  leftMotor.init();
+}
+
+void Robot::moveForward() {
+  rightMotor.motor_control(85);
+  leftMotor.motor_control(85);
+}
+
+void Robot::moveBackward() {
+  rightMotor.motor_control(-85);
+  leftMotor.motor_control(-85);
+}
+
+void Robot::turnLeftInPlace() {
+  rightMotor.motor_control(85);
+  leftMotor.motor_control(-85);
+}
+
+void Robot::turnRightInPlace() {
+  rightMotor.motor_control(-85);
+  leftMotor.motor_control(85);
+}
+
+void Robot::turnLeft() {
+  rightMotor.motor_control(85);
+  leftMotor.motor_control(50);
+}
+
+void Robot::turnRight() {
+  rightMotor.motor_control(50);
+  leftMotor.motor_control(85);
+}
+
+void Robot::stopRobot() {
+  rightMotor.motor_control(0);
+  leftMotor.motor_control(0);
 }
