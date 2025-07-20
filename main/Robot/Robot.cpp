@@ -1,11 +1,13 @@
 #include "Robot/Robot.h"
+#include <cstdint>
+#include <sys/types.h>
 
 void Robot::init() {
   udpServer.begin(joystick_port);
 }
 
 void Robot::update() {
-  handleJoystickInput();
+  if (_curr_mode == MANUAL) handleJoystickInput();
 }
 
 void Robot::handleJoystickInput() {
@@ -70,4 +72,12 @@ void Robot::joystickTeleopControl(float axis_left, float axis_right) {
   rightMotor.motor_control(right_speed);
 
   ESP_LOGI("Robot", "Motor control: L=%.1f%%, R=%.1f%%", left_speed, right_speed);
+}
+
+void Robot::switchMode(ControlMode newMode) {
+  if (newMode != _curr_mode) {
+    ControlMode prevMode = _curr_mode;
+    _curr_mode = newMode;
+    ESP_LOGI("Robot", "Mode change %d to %d", prevMode, _curr_mode);
+  }
 }

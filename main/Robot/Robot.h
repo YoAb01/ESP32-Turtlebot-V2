@@ -29,11 +29,12 @@ enum ControlMode {
 
 class Robot {
 public:
-  Robot() 
+  Robot()
     : led(GPIO_NUM_2),  // Initialize with builtin LED pin
       rightMotor(MOTOR_A_IN1_PIN, MOTOR_A_IN2_PIN, MOTOR_A_PWM_PIN),
       leftMotor(MOTOR_B_IN1_PIN, MOTOR_B_IN2_PIN, MOTOR_B_PWM_PIN),
-      udpServer()
+      udpServer(), 
+      _curr_mode(MANUAL)
   {
       rightMotor.init();
       leftMotor.init();
@@ -45,12 +46,15 @@ public:
   void handleJoystickInput();
   void joystickTeleopControl(float axis_left, float axis_right);
 
+  void switchMode(ControlMode newMode);
+
 private:
   LED led;
   Motor rightMotor;
   Motor leftMotor;
   WiFiManager wifi;
   UDPServer udpServer;
+  ControlMode _curr_mode;
 
   const uint16_t joystick_port = 4201;
 };
