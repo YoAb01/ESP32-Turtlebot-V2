@@ -23,7 +23,7 @@ void Robot::handleJoystickInput() {
   char rx_buffer[MAX_BUF];
   int rcv = udpServer.receive(rx_buffer, sizeof(rx_buffer));
   if (rcv > 0) {
-    ESP_LOGI("Robot", "Received packet: %s", rx_buffer);
+    // ESP_LOGI("Robot", "Received packet: %s", rx_buffer);
     int8_t axes[4];
     int8_t btns[4];
     // NOTE: Parsing using this format => "AXIS:ax1:ax2:ax3:ax4;BTN:btn1:btn2:btn3:btn4"
@@ -36,8 +36,8 @@ void Robot::handleJoystickInput() {
     int m_type = sscanf(rx_buffer, "%63[^;];%63s", axes_part, btns_part);
 
     if (m_type == 2) {
-      ESP_LOGI("Robot", "AXIS part: %s", axes_part);
-      ESP_LOGI("Robot", "BTN part: %s", btns_part);
+      // ESP_LOGI("Robot", "AXIS part: %s", axes_part);
+      // ESP_LOGI("Robot", "BTN part: %s", btns_part);
     } else {
       ESP_LOGE("Robot", "Failed to parse input string");
     }
@@ -45,7 +45,7 @@ void Robot::handleJoystickInput() {
     // Handle buttons first
     int m_btn_vals = sscanf(btns_part, "BTN:%hhd:%hhd:%hhd:%hhd", &btns[0], &btns[1], &btns[2], &btns[3]);
     if (m_btn_vals == 4) {
-      ESP_LOGI("Robot", "Buttons parsed: %d %d %d %d", btns[0], btns[1], btns[2], btns[3]);
+      // ESP_LOGI("Robot", "Buttons parsed: %d %d %d %d", btns[0], btns[1], btns[2], btns[3]);
       // Handle Buttons
       if (btns[0]) {
         switchMode(MANUAL);
@@ -90,14 +90,14 @@ void Robot::joystickTeleopControl(float axis_left, float axis_right) {
   leftMotor.motor_control(left_speed);
   rightMotor.motor_control(right_speed);
 
-  ESP_LOGI("Robot", "Motor control: L=%.1f%%, R=%.1f%%", left_speed, right_speed);
+  // ESP_LOGI("Robot", "Motor control: L=%.1f%%, R=%.1f%%", left_speed, right_speed);
 }
 
 void Robot::switchMode(ControlMode newMode) {
   if (newMode != _curr_mode) {
     ControlMode prevMode = _curr_mode;
     _curr_mode = newMode;
-    ESP_LOGI("Robot", "Mode change %d to %d", prevMode, _curr_mode);
+    // ESP_LOGI("Robot", "Mode change %d to %d", prevMode, _curr_mode);
   }
 }
 
