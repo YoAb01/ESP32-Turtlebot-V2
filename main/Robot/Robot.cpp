@@ -196,14 +196,14 @@ void Robot::setNextRobotStateInAutoMode(Obstacles obs) {
             case NO_OBSTACLE:
                 // Don't change state if already moving forward
                 break;
-            case OBSTACLE_RIGHT:
-                robot_state = TURN_LEFT;
+            case OBSTACLE_FRONT:
+                robot_state = shouldReverse() ? BACKWARD : TURN_LEFT_IN_PLACE;
                 break;
             case OBSTACLE_LEFT:
                 robot_state = TURN_RIGHT;
                 break;
-            case OBSTACLE_FRONT:
-                robot_state = TURN_LEFT_IN_PLACE;
+            case OBSTACLE_RIGHT:
+                robot_state = TURN_LEFT;
                 break;
         }
     }
@@ -274,6 +274,12 @@ uint8_t Robot::getCurrentSensorMask() {
     }
   }
   return mask;
+}
+
+bool Robot::shouldReverse() {
+  uint8_t sensor_mask = getCurrentSensorMask();
+  int active_sensors = __builtin_popcount(sensor_mask);
+  return (active_sensors >= 4);  // Reverse if 4 or 5 sensors active
 }
 
 void Robot::initMotors() {

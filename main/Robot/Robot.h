@@ -123,6 +123,7 @@ private:
   const uint16_t joystick_port = 4201;
 
   Obstacles resolveComplexPattern(uint8_t sensor_mask);
+  bool shouldReverse();
   uint8_t getCurrentSensorMask();  
 };
 
