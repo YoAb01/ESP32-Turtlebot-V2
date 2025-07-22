@@ -32,6 +32,12 @@
 #define IR_SENSOR_4 GPIO_NUM_19
 #define IR_SENSOR_5 GPIO_NUM_18
 
+#define SENSOR_LEFT_OUTER  0
+#define SENSOR_LEFT_INNER  1
+#define SENSOR_CENTER      2
+#define SENSOR_RIGHT_INNER 3
+#define SENSOR_RIGHT_OUTER 4
+
 enum ControlMode {
   MANUAL,
   AUTO
@@ -115,6 +121,9 @@ private:
   uint64_t timestamp = 0;
 
   const uint16_t joystick_port = 4201;
+
+  Obstacles resolveComplexPattern(uint8_t sensor_mask);
+  uint8_t getCurrentSensorMask();  
 };
 
 

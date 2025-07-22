@@ -210,18 +210,70 @@ void Robot::setNextRobotStateInAutoMode(Obstacles obs) {
 }
 
 Obstacles Robot::checkObstacles() {
-  bool left_detect = ir_sensor[0].is_object_detected() || ir_sensor[1].is_object_detected();
-  bool right_detect = ir_sensor[3].is_object_detected() || ir_sensor[4].is_object_detected();
-  bool front_detect = ir_sensor[2].is_object_detected();
+  uint8_t sensor_mask = getCurrentSensorMask();
+  switch (sensor_mask) {
+    // No obstacles
+    case 0b00000:
+      return NO_OBSTACLE;
+    // Front obstacles + variations
+    case 0b00100:  // Center only
+    case 0b01100:  // Center + Left Inner
+    case 0b00110:  // Center + Right Inner
+    case 0b01110:  // Center + Left/Right Inner
+    case 0b11100:  // Center + Left Inner/Outer
+    case 0b00111:  // Center + Right Inner/Outer
+    case 0b11111:  // All sensors (big obstacle)
+      return OBSTACLE_FRONT;
 
-  if (front_detect)
+    // Left obstacles only
+    case 0b10000:  // Left outer only
+    case 0b01000:  // Left inner only
+    case 0b11000:  // Both left sensors
+    case 0b10001:  // Left outer + right outer (prefer left turn)
+    case 0b01010:  // Left inner + right inner (prefer left turn)
+      return OBSTACLE_LEFT;
+
+    // Right obstacles only
+    case 0b00001:  // Right outer only
+    case 0b00010:  // Right inner only
+    case 0b00011:  // Both right sensors
+      return OBSTACLE_RIGHT;
+
+    default:
+      return resolveComplexPattern(sensor_mask);
+
+  }
+}
+
+Obstacles Robot::resolveComplexPattern(uint8_t sensor_mask) {
+  // Center is the highest priority
+  if (sensor_mask & (1 << SENSOR_CENTER)) {
     return OBSTACLE_FRONT;
-  else if (left_detect)
+  }
+  uint8_t left_mask = sensor_mask & 0b11000;   // Isolate left sensors
+  uint8_t right_mask = sensor_mask & 0b00011;  // Isolate right sensors
+
+  int left_count = __builtin_popcount(left_mask);   // Count set bits
+  int right_count = __builtin_popcount(right_mask);
+
+  if (left_count > right_count) {
     return OBSTACLE_LEFT;
-  else if (right_detect)
+  } else if (right_count > left_count) {
     return OBSTACLE_RIGHT;
-  else
-    return NO_OBSTACLE;
+  } else {
+    // Equal counts - use deterministic tie-breaker
+    return (sensor_mask & (1 << SENSOR_LEFT_OUTER)) ? OBSTACLE_LEFT : OBSTACLE_RIGHT;
+  }
+}
+
+uint8_t Robot::getCurrentSensorMask() {
+  uint8_t mask = 0;
+  for (int i = 0; i < 5; i++) {
+    if (ir_sensor[i].is_object_detected()) {
+      mask |= (1 << i);
+    }
+  }
+  return mask;
 }
 
 void Robot::initMotors() {
