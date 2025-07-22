@@ -181,6 +181,7 @@ void Robot::autonomousNav() {
         robot_state = TURN_LEFT_IN_PLACE;
       }
       break;
+
     default:
       robot_state = WAIT;
       stopRobot();
@@ -288,33 +289,33 @@ void Robot::initMotors() {
 }
 
 void Robot::moveForward() {
-  rightMotor.motor_control(85);
-  leftMotor.motor_control(85);
+  rightMotor.motor_control(80);
+  leftMotor.motor_control(80);
 }
 
 void Robot::moveBackward() {
-  rightMotor.motor_control(-85);
-  leftMotor.motor_control(-85);
+  rightMotor.motor_control(-80);
+  leftMotor.motor_control(-80);
 }
 
 void Robot::turnLeftInPlace() {
-  rightMotor.motor_control(-85);
-  leftMotor.motor_control(85);
+  rightMotor.motor_control(-80);
+  leftMotor.motor_control(80);
 }
 
 void Robot::turnRightInPlace() {
-  rightMotor.motor_control(85);
-  leftMotor.motor_control(-85);
+  rightMotor.motor_control(80);
+  leftMotor.motor_control(-80);
 }
 
 void Robot::turnLeft() {
-  rightMotor.motor_control(-85);
-  leftMotor.motor_control(85);
+  rightMotor.motor_control(-75);
+  leftMotor.motor_control(80);
 }
 
 void Robot::turnRight() {
-  rightMotor.motor_control(85);
-  leftMotor.motor_control(-85);
+  rightMotor.motor_control(80);
+  leftMotor.motor_control(-75);
 }
 
 void Robot::stopRobot() {
