@@ -170,7 +170,17 @@ void Robot::autonomousNav() {
         robot_state = FORWARD;
       }
       break;
+    case BACKWARD:
+      moveBackward();
+      timestamp = current_time;
+      robot_state = BACKWARD_IN_PROGRESS;
+      break;
 
+    case BACKWARD_IN_PROGRESS:
+      if (current_time - timestamp > BACKWARD_DURATION_MS) {
+        robot_state = TURN_LEFT_IN_PLACE;
+      }
+      break;
     default:
       robot_state = WAIT;
       stopRobot();
