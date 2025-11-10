@@ -2,45 +2,28 @@
 #include "LED/LED.h"
 #include "WiFi/WiFiManager.h"
 #include "freertos/idf_additions.h"
+#include "soc/gpio_num.h"
 #include "wifi_confidentials.h"
 #include "Robot/Robot.h"
+#include "IMU/IMU.h"
 
-WiFiManager wifi_ap;
-Robot robot;
+#define I2C_MASTER_SCK_IO           GPIO_NUM_9
+#define I2C_MASTER_SDA_IO           GPIO_NUM_8
 
-void init_wifi_ap() {
-  const char* ssid = "ESP32-Robot";
-  const char* pwd = "password_esp32_2025";
+IMU mpu6050(I2C_MASTER_SDA_IO, I2C_MASTER_SCK_IO);
 
-  if (wifi_ap.init_AP(ssid, pwd)) {
-    ESP_LOGI("WIFI", "Access Point started successfully!");
-  } else {
-    ESP_LOGE("WIFI", "Failed to start Access Point.");
-  }
-}
-
-void init_wifi_sta() {
-  const char* ssid = WIFI_SSID_CONN;
-  const char* pwd = WIFI_PASS_CONN;
-
-  if (wifi_ap.init_STA(ssid, pwd)) {
-    ESP_LOGI("WIFI", "Connected Successfully to local network");
-  } else {
-    ESP_LOGE("WIFI", "Failed to connect to local network");
-  }
-}
-
-void joystick_robot_teleop_task(void *pvParameter) {
-  Robot *robot = (Robot *)pvParameter;
+void test_imu_data(void *pvParameter) {
   while (1) {
-    robot->update();
-    vTaskDelay(pdMS_TO_TICKS(10));
+    double ax, ay, az, gx, gy, gz, tempC;
+    mpu6050.read_data(&ax, &ay, &az, &gx, &gy, &gz, &tempC);
+    printf("Accel (g): X=%.2f Y=%.2f Z=%.2f | Gyro (°/s): X=%.2f Y=%.2f Z=%.2f | Temp (°C): T=%.2f\n",
+               ax, ay, az, gx, gy, gz, tempC);
+    vTaskDelay(pdMS_TO_TICKS(500));
   }
 }
 
 extern "C" void app_main(void)
 {
-  init_wifi_sta();
-  robot.init();
-  xTaskCreate(joystick_robot_teleop_task, "joystick_task", 4096, &robot, 6, NULL);
+  mpu6050.init_imu();
+  xTaskCreate(test_imu_data, "imu_data_task", 2048, NULL, 4, NULL);
 }

@@ -7,3 +7,4 @@ sdkconfig.old
 wiki/X-Random Notes.md
 dependencies.lock
 main/WiFi/wifi_confidentials.h
+.clangd
