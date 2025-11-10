@@ -5,6 +5,7 @@ idf_component_register(
     "Timer/Timer.cpp"
     "Motor/Motor.cpp"
     "IMU/IMU.cpp"
+    "IMU/IMUSender.cpp"
     "IRSensor/IRSensor.cpp"
     "Camera/Camera.cpp"
     "WiFi/WiFiManager.cpp"
