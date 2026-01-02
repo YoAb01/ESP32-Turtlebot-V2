@@ -274,6 +274,7 @@ uint8_t Robot::getCurrentSensorMask() {
       mask |= (1 << i);
     }
   }
+  ESP_LOGE("Robot", "Mask: %u", mask);
   return mask;
 }
 
@@ -299,23 +300,23 @@ void Robot::moveBackward() {
 }
 
 void Robot::turnLeftInPlace() {
-  rightMotor.motor_control(-80);
-  leftMotor.motor_control(80);
-}
-
-void Robot::turnRightInPlace() {
   rightMotor.motor_control(80);
   leftMotor.motor_control(-80);
 }
 
-void Robot::turnLeft() {
-  rightMotor.motor_control(-75);
+void Robot::turnRightInPlace() {
+  rightMotor.motor_control(-80);
   leftMotor.motor_control(80);
 }
 
-void Robot::turnRight() {
+void Robot::turnLeft() {
   rightMotor.motor_control(80);
   leftMotor.motor_control(-75);
+}
+
+void Robot::turnRight() {
+  rightMotor.motor_control(-75);
+  leftMotor.motor_control(80);
 }
 
 void Robot::stopRobot() {
